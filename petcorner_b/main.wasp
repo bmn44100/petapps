@@ -1,0 +1,80 @@
+app petcorner {
+  wasp: {
+    version: "^0.15.0"
+  },
+  title: "petcorner",
+  client: {
+    rootComponent: import { Layout } from "@src/Layout.jsx",
+  },
+  auth: {
+    userEntity: User,
+    methods: {
+      usernameAndPassword: {}
+    },
+    onAuthFailedRedirectTo: "/login",
+    onAuthSucceededRedirectTo: "/"
+  },
+}
+
+route LoginRoute { path: "/login", to: LoginPage }
+page LoginPage {
+  component: import Login from "@src/pages/auth/Login.jsx"
+}
+route SignupRoute { path: "/signup", to: SignupPage }
+page SignupPage {
+  component: import Signup from "@src/pages/auth/Signup.jsx"
+}
+
+action addProductToCart {
+  fn: import { addProductToCart } from "@src/actions.js",
+  entities: [Cart, CartItem, Product]
+}
+
+action createOrder {
+  fn: import { createOrder } from "@src/actions.js",
+  entities: [Order, OrderItem, Cart, CartItem]
+}
+
+action writeReview {
+  fn: import { writeReview } from "@src/actions.js",
+  entities: [Review, Product]
+}
+
+query getProducts {
+  fn: import { getProducts } from "@src/queries.js",
+  entities: [Product, Category]
+}
+
+query getCart {
+  fn: import { getCart } from "@src/queries.js",
+  entities: [Cart, CartItem, Product]
+}
+
+query getOrderHistory {
+  fn: import { getOrderHistory } from "@src/queries.js",
+  entities: [Order, OrderItem, Product]
+}
+
+route HomeRoute { path: "/", to: HomePage }
+page HomePage {
+  component: import HomePage from "@src/pages/HomePage.jsx",
+  authRequired: false
+}
+
+route ProductRoute { path: "/product/:productId", to: ProductPage }
+page ProductPage {
+  component: import ProductPage from "@src/pages/ProductPage.jsx",
+  authRequired: true
+}
+
+route CartRoute { path: "/cart", to: CartPage }
+page CartPage {
+  component: import CartPage from "@src/pages/CartPage.jsx",
+  authRequired: true
+}
+
+route OrderHistoryRoute { path: "/orders", to: OrderHistoryPage }
+page OrderHistoryPage {
+  component: import OrderHistoryPage from "@src/pages/OrderHistoryPage.jsx",
+  authRequired: true
+}

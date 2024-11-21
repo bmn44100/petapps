@@ -1,0 +1,70 @@
+datasource db {
+  provider = "sqlite"
+  // Wasp requires that the url is set to the DATABASE_URL environment variable.
+  url      = env("DATABASE_URL")
+}
+
+// Wasp requires the `prisma-client-js` generator to be present.
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+    id       Int            @id @default(autoincrement())
+    pets     Pet[]
+    orders   Order[]
+    wishlist WishlistItem[]
+    Review   Review[]
+}
+
+model Pet {
+    id      Int    @id @default(autoincrement())
+    name    String
+    breed   String
+    age     Int
+    owner   User   @relation(fields: [ownerId], references: [id])
+    ownerId Int
+}
+
+model Product {
+    id           Int            @id @default(autoincrement())
+    name         String
+    description  String
+    price        Float
+    category     String
+    stock        Int
+    images       String
+    reviews      Review[]
+    Order        Order?         @relation(fields: [orderId], references: [id])
+    orderId      Int?
+    WishlistItem WishlistItem[]
+}
+
+model Order {
+    id        Int       @id @default(autoincrement())
+    user      User      @relation(fields: [userId], references: [id])
+    userId    Int
+    products  Product[]
+    total     Float
+    status    String
+    createdAt DateTime  @default(now())
+}
+
+model Review {
+    id        Int      @id @default(autoincrement())
+    product   Product  @relation(fields: [productId], references: [id])
+    productId Int
+    user      User     @relation(fields: [userId], references: [id])
+    userId    Int
+    rating    Int
+    comment   String
+    createdAt DateTime @default(now())
+}
+
+model WishlistItem {
+    id        Int     @id @default(autoincrement())
+    user      User    @relation(fields: [userId], references: [id])
+    userId    Int
+    product   Product @relation(fields: [productId], references: [id])
+    productId Int
+}

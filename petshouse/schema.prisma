@@ -1,0 +1,78 @@
+datasource db {
+  provider = "sqlite"
+  // Wasp requires that the url is set to the DATABASE_URL environment variable.
+  url      = env("DATABASE_URL")
+}
+
+// Wasp requires the `prisma-client-js` generator to be present.
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+    id       Int          @id @default(autoincrement())
+    orders   Order[]
+    profiles PetProfile[]
+    wishlist Product[]
+    cart     CartItem[]
+}
+
+model Product {
+    id               Int            @id @default(autoincrement())
+    name             String
+    description      String
+    price            Float
+    category         String
+    stock            Int
+    mainImage        String
+    additionalImages ProductImage[]
+    User             User?          @relation(fields: [userId], references: [id])
+    userId           Int?
+    OrderItem        OrderItem[]
+    CartItem         CartItem[]
+}
+
+model ProductImage {
+    id        Int     @id @default(autoincrement())
+    product   Product @relation(fields: [productId], references: [id])
+    productId Int
+    url       String
+}
+
+model Order {
+    id        Int         @id @default(autoincrement())
+    user      User        @relation(fields: [userId], references: [id])
+    userId    Int
+    items     OrderItem[]
+    status    String
+    total     Float
+    createdAt DateTime    @default(now())
+}
+
+model OrderItem {
+    id        Int     @id @default(autoincrement())
+    order     Order   @relation(fields: [orderId], references: [id])
+    orderId   Int
+    product   Product @relation(fields: [productId], references: [id])
+    productId Int
+    quantity  Int
+}
+
+model PetProfile {
+    id             Int     @id @default(autoincrement())
+    user           User    @relation(fields: [userId], references: [id])
+    userId         Int
+    name           String
+    age            Int
+    breed          String
+    medicalRecords String?
+}
+
+model CartItem {
+    id        Int     @id @default(autoincrement())
+    user      User    @relation(fields: [userId], references: [id])
+    userId    Int
+    product   Product @relation(fields: [productId], references: [id])
+    productId Int
+    quantity  Int
+}

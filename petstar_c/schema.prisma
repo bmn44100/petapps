@@ -1,0 +1,75 @@
+datasource db {
+  provider = "sqlite"
+  // Wasp requires that the url is set to the DATABASE_URL environment variable.
+  url      = env("DATABASE_URL")
+}
+
+// Wasp requires the `prisma-client-js` generator to be present.
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+          id Int @id @default(autoincrement())
+          username String @unique
+          email String @unique
+          orders Order[]
+          wishlists Wishlist[]
+          petProfiles PetProfile[]
+          vendorProfile VendorProfile?
+          address String?
+}
+
+model Product {
+          id Int @id @default(autoincrement())
+          name String
+          description String
+          price Float
+          category String
+          stock Int
+          reviews Review[]
+}
+
+model Order {
+          id Int @id @default(autoincrement())
+          user User @relation(fields: [userId], references: [id])
+          userId Int
+          products Product[]
+          status String
+          total Float
+          orderDate DateTime @default(now())
+}
+
+model Review {
+          id Int @id @default(autoincrement())
+          product Product @relation(fields: [productId], references: [id])
+          productId Int
+          user User @relation(fields: [userId], references: [id])
+          userId Int
+          rating Int
+          comment String?
+}
+
+model VendorProfile {
+          id Int @id @default(autoincrement())
+          user User @relation(fields: [userId], references: [id])
+          userId Int @unique
+          storeName String
+          products Product[]
+}
+
+model Wishlist {
+          id Int @id @default(autoincrement())
+          user User @relation(fields: [userId], references: [id])
+          userId Int
+          products Product[]
+}
+
+model PetProfile {
+          id Int @id @default(autoincrement())
+          user User @relation(fields: [userId], references: [id])
+          userId Int
+          petName String
+          petType String
+          age Int?
+}

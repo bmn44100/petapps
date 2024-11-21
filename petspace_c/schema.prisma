@@ -1,0 +1,72 @@
+datasource db {
+  provider = "sqlite"
+  // Wasp requires that the url is set to the DATABASE_URL environment variable.
+  url      = env("DATABASE_URL")
+}
+
+// Wasp requires the `prisma-client-js` generator to be present.
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+    id          Int          @id @default(autoincrement())
+    petProfiles PetProfile[]
+    orders      Order[]
+    reviews     Review[]
+}
+
+model Product {
+    id          Int         @id @default(autoincrement())
+    name        String
+    description String
+    price       Float
+    stock       Int
+    category    String
+    images      String
+    reviews     Review[]
+    OrderItem   OrderItem[]
+}
+
+model Order {
+    id          Int         @id @default(autoincrement())
+    user        User        @relation(fields: [userId], references: [id])
+    userId      Int
+    totalAmount Float
+    status      String
+    orderItems  OrderItem[]
+    createdAt   DateTime    @default(now())
+}
+
+model OrderItem {
+    id              Int     @id @default(autoincrement())
+    order           Order   @relation(fields: [orderId], references: [id])
+    orderId         Int
+    product         Product @relation(fields: [productId], references: [id])
+    productId       Int
+    quantity        Int
+    priceAtPurchase Float
+}
+
+model Review {
+    id        Int      @id @default(autoincrement())
+    user      User     @relation(fields: [userId], references: [id])
+    userId    Int
+    product   Product  @relation(fields: [productId], references: [id])
+    productId Int
+    rating    Int
+    comment   String
+    createdAt DateTime @default(now())
+}
+
+model PetProfile {
+    id                 Int     @id @default(autoincrement())
+    user               User    @relation(fields: [userId], references: [id])
+    userId             Int
+    name               String
+    species            String
+    breed              String
+    age                Int
+    medicalRecords     String?
+    dietaryPreferences String?
+}
